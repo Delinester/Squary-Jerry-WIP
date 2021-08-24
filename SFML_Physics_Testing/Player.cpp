@@ -72,8 +72,8 @@ void Player::checkCollision(std::vector<Obstacle>& levelTiles) {
 				}
 			}
 			//Top collision
-			else if ((playerBounds.top > levelBounds.top   //			
-				&& playerBounds.top < levelBounds.top + levelBounds.height)  //
+			else if ((playerBounds.top > levelBounds.top   	
+				&& playerBounds.top < levelBounds.top + levelBounds.height)  
 				&& playerBounds.left < levelBounds.left + levelBounds.width
 				&& playerBounds.left + playerBounds.width > levelBounds.left
 				&& levelTiles[i].isCollisionEnabled()) {
@@ -81,8 +81,8 @@ void Player::checkCollision(std::vector<Obstacle>& levelTiles) {
 				this->setColliderPosition(playerBounds.left, levelBounds.top + levelBounds.height);
 		     }			
 			//Right collision
-			if (playerBounds.left < levelBounds.left //			
-				&& playerBounds.top < levelBounds.top + levelBounds.height //
+			if (playerBounds.left < levelBounds.left 		
+				&& playerBounds.top < levelBounds.top + levelBounds.height 
 				&& playerBounds.top + playerBounds.height > levelBounds.top
 				&& playerBounds.left + playerBounds.width > levelBounds.left
 				&& collisionDistanceRight < collisionDistanceBottom && collisionDistanceRight < collisionDistanceTop
@@ -114,7 +114,7 @@ void Player::update(float deltaTime, float gravity, std::vector<Obstacle>& level
 	//Gravity force	
 	m_velocity.y += gravity;	
 
-	//
+	//Get control
 	this->getUserControl();
 
 	//Jump

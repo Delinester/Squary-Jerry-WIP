@@ -12,14 +12,16 @@ void Game::drawEverything(sf::RenderWindow& window) {
 	
 	m_player.draw(window);
 }
-//1, 2, 3 - ground
+//1,3 - ground
 //4 - wall
 //5 - spikesUp
 //6 - spikesRight
 //7 - spikesDown
 //8 - spikesLeft
-//9 - horizontalMovingPlatform
+//2, 9 - horizontalMovingPlatform
 //10 - door
+// //11 - checkpoint
+//99 - player
 void Game::initializeLevel1() {	
 	level1 = 
 	{ {4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4},
