@@ -5,7 +5,7 @@
 
 int main() {
 	sf::RenderWindow window(sf::VideoMode(1200, 600), "Test_Physics");
-	window.setFramerateLimit(200);
+	/*window.setFramerateLimit(200);*/
 
 	sf::Text hint;
 	sf::Font font;
@@ -22,9 +22,11 @@ int main() {
 	game.initializeLevel1();
 
 	sf::Clock clock;
+	float deltaTime;
 	
 	while (window.isOpen()) {
-		float deltaTime = static_cast<float>(clock.getElapsedTime().asMilliseconds()) / 10;
+		deltaTime = static_cast<float>(clock.getElapsedTime().asMilliseconds()) / 10 ;
+		
 		clock.restart();
 
 		sf::Event event;
@@ -32,7 +34,7 @@ int main() {
 
 		window.clear(sf::Color::White);
 
-		game.setDeltaTime(deltaTime);
+		game.setDeltaTime(deltaTime);		
 		game.updateEverything();
 		game.drawEverything(window);
 		if (otherClock.getElapsedTime().asSeconds() < 10) window.draw(hint);

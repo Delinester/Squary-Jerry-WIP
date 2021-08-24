@@ -26,6 +26,7 @@ public:
 		: m_width(width), m_height(height), framesNumber(numberOfFrames)
 	{
 		m_texture.loadFromFile(textureFilePath);	
+		m_sprite.setTextureRect(sf::IntRect(0, 0, m_width, m_height));
 
 		m_velocity.x = 0;
 		m_velocity.y = 0;		

@@ -2,10 +2,10 @@
 
 void Player::getUserControl() {
 	if ((sf::Keyboard::isKeyPressed(sf::Keyboard::X)) && isJumping == false) { 
-		m_jumpForce = 9; isJumping = true; m_jumpSound.playSound(); this->setState(States::IN_AIR); 
+		m_jumpForce = 12; isJumping = true; m_jumpSound.playSound(); this->setState(States::IN_AIR); 
 	}
 	else if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) && isJumping == false) { 
-		m_jumpForce = 12; isJumping = true; m_jumpSound.playSound(); this->setState(States::IN_AIR);
+		m_jumpForce = 17; isJumping = true; m_jumpSound.playSound(); this->setState(States::IN_AIR);
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A)) { 
 		this->setDirection(Directions::LEFT);
@@ -107,7 +107,7 @@ void Player::update(float deltaTime, float gravity, std::vector<Obstacle>& level
 	//Check for falling
 	if (nextPos.left > 1200 || nextPos.left < 0 || nextPos.top > 600 || nextPos.top < 0) { this->setPosition(m_startPos.x, m_startPos.y); }
 	//Gravity force	
-	m_velocity.y += gravity;	
+	m_velocity.y += gravity * deltaTime;	
 
 	//
 	this->getUserControl();
@@ -115,7 +115,7 @@ void Player::update(float deltaTime, float gravity, std::vector<Obstacle>& level
 	//Jump
 	if (isJumping && !isJumpDone) {
 		isOnGround = false;		
-		m_velocity.y = -m_jumpForce;			
+		m_velocity.y = -m_jumpForce;
 		isJumpDone = true;
 	}	
 	if (!isOnGround) this->setState(States::IN_AIR);
@@ -123,10 +123,10 @@ void Player::update(float deltaTime, float gravity, std::vector<Obstacle>& level
 	//Move by X
 	switch (currentDirection) {
 	case Directions::RIGHT:
-		m_velocity.x = m_walkSpeed;			
+		m_velocity.x = m_walkSpeed;
 		break;
 	case Directions::LEFT:
-		m_velocity.x = -m_walkSpeed;		
+		m_velocity.x = -m_walkSpeed;
 		break;
 	}	
 
