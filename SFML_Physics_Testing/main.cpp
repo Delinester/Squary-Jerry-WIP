@@ -5,7 +5,7 @@
 
 int main() {
 	sf::RenderWindow window(sf::VideoMode(1200, 600), "Test_Physics");
-	/*window.setFramerateLimit(200);*/
+	window.setFramerateLimit(60);
 
 	sf::Text hint;
 	sf::Font font;
