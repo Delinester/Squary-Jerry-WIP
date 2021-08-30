@@ -9,7 +9,9 @@ public:
 		SPIKE,
 		DOOR,
 		CHECKPOINT,
-		HORIZONTAL_MOVABLE_PLATFORM
+		LAVA,
+		HORIZONTAL_MOVABLE_PLATFORM,
+	    VERTICAL_MOVABLE_PLATFORM
 	};
 	Obstacle(sf::Texture* texture, ObstacleType obsTy) : m_type(obsTy) {	
 		m_texture = texture;
@@ -28,6 +30,8 @@ public:
 	void setColliderSize(float width, float height);
 	void setCollision(bool isEnabled);	
 	void setHorizontalMovingVariables(float xDis, float vel);
+	void setVerticalMovingVariables(float yDis, float vel);
+	void setMovingSpeed(float vel);
 
 	float getVelocity() const;
 	ObstacleType getType() const;
@@ -36,10 +40,11 @@ public:
 	bool isCollisionEnabled() const;
 
 	void moveCollider(float x, float y);
-	void makeHorizontalMoving();
-	void update();
+	void makeHorizontalMoving(float deltaTime);
+	void makeVerticalMoving(float deltaTime);
+	void update(float deltaTime);
 
-	void draw(sf::RenderWindow& window);
+	void draw(sf::RenderWindow& window, bool drawCollision = false);
 private:
 	sf::FloatRect m_collider;
 	sf::RectangleShape m_rect;
@@ -50,9 +55,11 @@ private:
 	sf::Vector2f startPos;
 
 	float addX = 0.f, addY = 0.f;
-	float xDistance = 0.f, velocity = 0.f;
+	float xDistance = 0.f, yDistance = 0.f, velocity = 0.f;
 	bool isMoveRightDone = false;
 	bool isMoveLeftDone = false;
+	bool isMoveUpDone = false;
+	bool isMoveDownDone = false;
 
 	ObstacleType m_type;
 

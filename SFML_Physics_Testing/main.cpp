@@ -4,29 +4,19 @@
 #include "Game.h"
 
 int main() {
-	sf::RenderWindow window(sf::VideoMode(1200, 600), "Test_Physics");
-	window.setFramerateLimit(60);
+	sf::RenderWindow window(sf::VideoMode(1200, 600), "Squary Jerry");
+	window.setFramerateLimit(100);
 
-	sf::Text hint;
-	sf::Font font;
-	font.loadFromFile("Fonts\\ka1.ttf");
-	hint.setFont(font);
-	hint.setCharacterSize(50);
-	hint.setOutlineThickness(3.f);
-	hint.setOutlineColor(sf::Color::Black);
-	hint.setString("Press Z to jump further, \nX to jump weaker, \nF to interact");
-	hint.setPosition(200, 200);
-	sf::Clock otherClock;
+	//deltaTime for 60 ---- 1.5
+	//deltaTime for 200 ----  0.5	
 
-	Game game;	
-	game.initializeLevel1();
+	Game game;		
 
 	sf::Clock clock;
 	float deltaTime;
 	
 	while (window.isOpen()) {
-		deltaTime = static_cast<float>(clock.getElapsedTime().asMilliseconds()) / 10 ;
-		
+		deltaTime = static_cast<float>(clock.getElapsedTime().asMilliseconds()) / 10 ;		
 		clock.restart();
 
 		sf::Event event;
@@ -34,10 +24,13 @@ int main() {
 
 		window.clear(sf::Color::White);
 
-		game.setDeltaTime(deltaTime);		
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::C)) game.setCollisionToBeDrawn(true);
+		else game.setCollisionToBeDrawn(false);
+
+		game.setDeltaTime(deltaTime);	
+		game.setEvent(event);
 		game.updateEverything();
-		game.drawEverything(window);
-		if (otherClock.getElapsedTime().asSeconds() < 10) window.draw(hint);
+		game.drawEverything(window);		
 			
 		window.display();
 	}

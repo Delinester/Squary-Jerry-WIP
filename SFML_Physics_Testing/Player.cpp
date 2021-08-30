@@ -2,13 +2,14 @@
 
 void Player::getUserControl() {
 	if ((sf::Keyboard::isKeyPressed(sf::Keyboard::X)) && isJumping == false) { 
-		m_jumpForce = 9; 
+		m_jumpForce = 11; 
 		isJumping = true; 
 		m_jumpSound.playSound(); 
 		this->setState(States::IN_AIR); 
 	}
 	else if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) && isJumping == false) { 
-		m_jumpForce = 12; isJumping = true; 
+		m_jumpForce = 14;
+		isJumping = true; 
 		m_jumpSound.playSound(); 
 		this->setState(States::IN_AIR);
 	}
@@ -19,16 +20,16 @@ void Player::getUserControl() {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D)) { 
 		this->setDirection(Directions::RIGHT); 
 		this->setState(States::GOING_RIGHT);
-	}
+	}		
 }
 
 //AABB Collision
-void Player::checkCollision(std::vector<Obstacle>& levelTiles) {
+void Player::checkCollision(std::vector<Obstacle>& levelTiles, float deltaTime) {
 	for (int i = 0; i < levelTiles.size(); ++i) {
 		sf::FloatRect levelBounds = levelTiles[i].getColliderBounds();
-		sf::FloatRect playerBounds = nextPos;	
+		sf::FloatRect playerBounds = collider;	
 		
-		float collisionDistanceLeft = (levelBounds.left + levelBounds.width) - playerBounds.left;
+		float collisionDistanceLeft = (levelBounds.left + levelBounds.width) - playerBounds.left;		
 		float collisionDistanceRight = (playerBounds.left + playerBounds.width) - levelBounds.left;
 		float collisionDistanceBottom = (playerBounds.top + playerBounds.height) - levelBounds.top;
 		float collisionDistanceTop = (levelBounds.top + levelBounds.height) - playerBounds.top;
@@ -49,47 +50,19 @@ void Player::checkCollision(std::vector<Obstacle>& levelTiles) {
 		}
 		//Specific collision
 		else {
-			//Bottom collision
-			if (playerBounds.top < levelBounds.top
-				&& playerBounds.left < levelBounds.left + levelBounds.width
-				&& playerBounds.left + playerBounds.width > levelBounds.left
-				&& playerBounds.top + playerBounds.height > levelBounds.top
-				&& levelTiles[i].isCollisionEnabled()) {				
-				if (levelTiles[i].getType() == Obstacle::ObstacleType::HORIZONTAL_MOVABLE_PLATFORM) {
-					m_velocity.y = 0.f;
-					m_velocity.x = levelTiles[i].getVelocity();
-					this->setColliderPosition(playerBounds.left + m_velocity.x, levelBounds.top - playerBounds.height);
-					isJumping = false;
-					isJumpDone = false;
-					isOnGround = true;
-				}
-				else {
-					m_velocity.y = 0.f;
-					this->setColliderPosition(playerBounds.left, levelBounds.top - playerBounds.height);
-					isJumping = false;
-					isJumpDone = false;
-					isOnGround = true;
-				}
-			}
-			//Top collision
-			else if ((playerBounds.top > levelBounds.top   	
-				&& playerBounds.top < levelBounds.top + levelBounds.height)  
-				&& playerBounds.left < levelBounds.left + levelBounds.width
-				&& playerBounds.left + playerBounds.width > levelBounds.left
-				&& levelTiles[i].isCollisionEnabled()) {
-				m_velocity.y = 0.f;
-				this->setColliderPosition(playerBounds.left, levelBounds.top + levelBounds.height);
-		     }			
 			//Right collision
-			if (playerBounds.left < levelBounds.left 		
-				&& playerBounds.top < levelBounds.top + levelBounds.height 
+			if (playerBounds.left < levelBounds.left
+				&& playerBounds.top < levelBounds.top + levelBounds.height
 				&& playerBounds.top + playerBounds.height > levelBounds.top
 				&& playerBounds.left + playerBounds.width > levelBounds.left
 				&& collisionDistanceRight < collisionDistanceBottom && collisionDistanceRight < collisionDistanceTop
 				&& levelTiles[i].isCollisionEnabled()) {
-				m_velocity.x = 0.f;
-				this->setColliderPosition(levelBounds.left - playerBounds.width, playerBounds.top);
 
+				m_velocity.x = 0.f;
+				//
+				std::cout << "RIGHT\n";
+				//
+				this->setColliderPosition(levelBounds.left - playerBounds.width, playerBounds.top);
 			}
 			//Left collision
 			else if (playerBounds.left + playerBounds.width > levelBounds.left + levelBounds.width
@@ -100,9 +73,52 @@ void Player::checkCollision(std::vector<Obstacle>& levelTiles) {
 				&& levelTiles[i].isCollisionEnabled()) {
 
 				m_velocity.x = 0.f;
+				//
+				std::cout << "LEFT\n";
+				//
 				this->setColliderPosition(levelBounds.left + levelBounds.width, playerBounds.top);
-
 			}
+			//Bottom collision
+			if (playerBounds.top < levelBounds.top
+				&& playerBounds.left < levelBounds.left + levelBounds.width
+				&& playerBounds.left + playerBounds.width > levelBounds.left
+				&& playerBounds.top + playerBounds.height > levelBounds.top
+				&& collisionDistanceBottom < collisionDistanceRight && collisionDistanceBottom < collisionDistanceLeft
+				&& levelTiles[i].isCollisionEnabled()) {
+
+				m_velocity.y = 0.f;				
+				isJumping = false;
+				isJumpDone = false;
+				isOnGround = true;
+				//
+				std::cout << "BOTOOM\n";
+				//
+				if (levelTiles[i].getType() == Obstacle::ObstacleType::HORIZONTAL_MOVABLE_PLATFORM) {					
+					m_velocity.x = levelTiles[i].getVelocity();
+					this->setColliderPosition(playerBounds.left + m_velocity.x * deltaTime, levelBounds.top - playerBounds.height);					
+				}
+				else if (levelTiles[i].getType() == Obstacle::ObstacleType::VERTICAL_MOVABLE_PLATFORM) {
+					m_velocity.x = levelTiles[i].getVelocity();
+					this->setColliderPosition(playerBounds.left, levelBounds.top - playerBounds.height + levelTiles[i].getVelocity());
+				}
+				else {					
+					this->setColliderPosition(playerBounds.left, levelBounds.top - playerBounds.height);					
+				}
+			}
+			//Top collision
+			else if ((playerBounds.top > levelBounds.top   	
+				&& playerBounds.top < levelBounds.top + levelBounds.height)  
+				&& playerBounds.left < levelBounds.left + levelBounds.width
+				&& playerBounds.left + playerBounds.width > levelBounds.left
+				&& collisionDistanceTop < collisionDistanceRight && collisionDistanceTop < collisionDistanceLeft
+				&& levelTiles[i].isCollisionEnabled()) {
+
+				m_velocity.y = 0.f;
+				//
+				std::cout << "TOP\n";
+				//
+				this->setColliderPosition(playerBounds.left, levelBounds.top + levelBounds.height);
+		     }						
 		}
 		
 	}
@@ -110,9 +126,9 @@ void Player::checkCollision(std::vector<Obstacle>& levelTiles) {
 
 void Player::update(float deltaTime, float gravity, std::vector<Obstacle>& levelTiles) {
 	//Check for falling
-	if (nextPos.left > 1200 || nextPos.left < 0 || nextPos.top > 600 || nextPos.top < 0) { this->setPosition(m_startPos.x, m_startPos.y); }
+	if (collider.left > 1200 || collider.left < 0 || collider.top > 600 || collider.top < 0) { this->setPosition(m_startPos.x, m_startPos.y); }
 	//Gravity force	
-	m_velocity.y += gravity;	
+	m_velocity.y += gravity * deltaTime;	
 
 	//Get control
 	this->getUserControl();
@@ -124,7 +140,7 @@ void Player::update(float deltaTime, float gravity, std::vector<Obstacle>& level
 		isJumpDone = true;
 	}	
 	if (!isOnGround) this->setState(States::IN_AIR);
-	else m_sprite.setTexture(m_texture);
+	
 	//Move by X
 	switch (currentDirection) {
 	case Directions::RIGHT:
@@ -135,13 +151,13 @@ void Player::update(float deltaTime, float gravity, std::vector<Obstacle>& level
 		break;
 	}	
 
-	nextPos = m_sprite.getGlobalBounds();
-	nextPos.left += m_velocity.x * deltaTime;
-	nextPos.top += m_velocity.y * deltaTime;
-	collisionBox.setPosition(nextPos.left, nextPos.top);		
+	collider = m_sprite.getGlobalBounds();
+	collider.left += m_velocity.x * deltaTime;
+	collider.top += m_velocity.y * deltaTime;
+    collisionBox.setPosition(collider.left, collider.top);		
 
-	this->checkCollision(levelTiles);
-	this->setPosition(nextPos.left, nextPos.top);	
+	this->checkCollision(levelTiles, deltaTime);
+	this->setPosition(collider.left, collider.top);	
 	this->animate(deltaTime);
 	m_velocity.x = 0;	
 	this->setState(States::IDLE);

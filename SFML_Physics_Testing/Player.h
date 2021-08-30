@@ -25,7 +25,8 @@ public:
 	Player(std::string textureFilePath, int width, int height, int numberOfFrames) 
 		: m_width(width), m_height(height), framesNumber(numberOfFrames)
 	{
-		m_texture.loadFromFile(textureFilePath);	
+		m_texture.loadFromFile(textureFilePath);
+		m_sprite.setTexture(m_texture);
 		m_sprite.setTextureRect(sf::IntRect(0, 0, m_width, m_height));
 
 		m_velocity.x = 0;
@@ -51,20 +52,23 @@ public:
 		m_sprite.setPosition(sf::Vector2f(m_position.x, m_position.y));			
 	}	
 	void setColliderPosition(float x, float y) {
-		nextPos.left = x;
-		nextPos.top = y;		
+		collider.left = x;
+		collider.top = y;		
 	}
 	void setDirection(Directions dir) { currentDirection = dir; }
 
 	void setState(States state) { currentState = state; }
 
-	void draw(sf::RenderWindow& window) { window.draw(m_sprite); window.draw(collisionBox); }
+	void draw(sf::RenderWindow& window, bool drawCollision = false) { 
+		window.draw(m_sprite); 
+		if (drawCollision) window.draw(collisionBox); 
+	}
 
 	void getUserControl();
 
 	void update(float deltaTime, float gravity, std::vector<Obstacle>& levelTiles);
 
-	void checkCollision(std::vector<Obstacle>& levelTiles);
+	void checkCollision(std::vector<Obstacle>& levelTiles, float deltaTime);
 
 	void setStartPos(sf::Vector2f startPoint) { m_startPos = startPoint; }
 
@@ -78,7 +82,7 @@ private:
 	sf::Vector2f m_acceleration;
 	
 	sf::RectangleShape collisionBox;
-	sf::FloatRect nextPos;
+	sf::FloatRect collider;
 	
 	sf::Vector2f m_startPos;
 	//Sounds

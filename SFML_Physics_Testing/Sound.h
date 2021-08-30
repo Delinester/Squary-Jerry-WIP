@@ -9,8 +9,7 @@ public:
 		sound.setBuffer(buffer);
 	}
 	void playSound() { 
-		static sf::Clock clock;
-		if (clock.getElapsedTime().asMilliseconds())
+		
 		sound.play();
 	}
 	void setLoop(bool isLoop) { sound.setLoop(isLoop); }
