@@ -1,6 +1,11 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <cmath>
+#include <vector>
+#include <iostream>
+#include "Collision.h"
+#include "Animator.h"
+
 class Obstacle {
 public:
 	enum class ObstacleType {
@@ -10,58 +15,72 @@ public:
 		DOOR,
 		CHECKPOINT,
 		LAVA,
+		HEART,
 		HORIZONTAL_MOVABLE_PLATFORM,
 	    VERTICAL_MOVABLE_PLATFORM
-	};
-	Obstacle(sf::Texture* texture, ObstacleType obsTy) : m_type(obsTy) {	
+	};	
+	Obstacle(sf::Texture* texture, ObstacleType obsTy, bool hasCollision = true, bool hasAnimation = false)
+		: m_type(obsTy), m_animation(&m_sprite)
+	{			
 		m_texture = texture;
-		m_sprite.setTexture(*texture);
-		m_collider = m_sprite.getGlobalBounds();
-
-		m_rect.setFillColor(sf::Color::Transparent);
-		m_rect.setOutlineThickness(1.f);
-		m_rect.setOutlineColor(sf::Color::Magenta);
-		m_rect.setSize(sf::Vector2f(m_collider.width, m_collider.height));
+		m_sprite.setTexture(*m_texture);		
+		isAnimated = hasAnimation;			
+		setCollision(hasCollision);		
 	}
-	void setColliderPos(sf::FloatRect rectPos);
-	void setColliderPos(sf::Vector2f vectPos);
-	void setSpritePos(sf::Vector2f vectPos);	
-	void setColliderScale(float scale);
-	void setColliderSize(float width, float height);
+	Obstacle(const Obstacle& obstacleOrig) {
+		m_collider = obstacleOrig.m_collider;
+		m_sprite = obstacleOrig.m_sprite;
+		m_texture = obstacleOrig.m_texture;
+		startPos = obstacleOrig.startPos;
+		m_type = obstacleOrig.m_type;
+		isAnimated = obstacleOrig.isAnimated;
+		xDistance = obstacleOrig.xDistance;
+		yDistance = obstacleOrig.yDistance;
+		velocity = obstacleOrig.velocity;
+		isMoveRightDone = obstacleOrig.isMoveRightDone;
+		isMoveLeftDone = obstacleOrig.isMoveLeftDone;
+		isMoveUpDone = obstacleOrig.isMoveUpDone;
+		isMoveDownDone = obstacleOrig.isMoveDownDone;
+		m_animation = obstacleOrig.m_animation;
+
+		m_animation.setSpritePointer(&m_sprite);
+	}
+	void setSpritePos(sf::Vector2f vectPos);		
 	void setCollision(bool isEnabled);	
 	void setHorizontalMovingVariables(float xDis, float vel);
 	void setVerticalMovingVariables(float yDis, float vel);
 	void setMovingSpeed(float vel);
+	void setSpriteToAnimated(bool isAnim);
 
 	float getVelocity() const;
 	ObstacleType getType() const;
 	sf::FloatRect getColliderBounds() const;
 	sf::FloatRect getSpriteBounds() const;
-	bool isCollisionEnabled() const;
 
-	void moveCollider(float x, float y);
+	bool isCollisionEnabled() const;
+	
 	void makeHorizontalMoving(float deltaTime);
 	void makeVerticalMoving(float deltaTime);
-	void update(float deltaTime);
+	void update(float deltaTime);	
 
-	void draw(sf::RenderWindow& window, bool drawCollision = false);
+	void draw(sf::RenderWindow& window, bool drawCollision = false);	
+public:
+	Animator m_animation;
 private:
-	sf::FloatRect m_collider;
-	sf::RectangleShape m_rect;
-	
+	//Colliders	
+	Collision m_collider;
+	//Sprite
 	sf::Sprite m_sprite;	
 	sf::Texture* m_texture;
-
+	//Coords
 	sf::Vector2f startPos;
-
-	float addX = 0.f, addY = 0.f;
+	//Variables	
 	float xDistance = 0.f, yDistance = 0.f, velocity = 0.f;
 	bool isMoveRightDone = false;
 	bool isMoveLeftDone = false;
 	bool isMoveUpDone = false;
-	bool isMoveDownDone = false;
-
-	ObstacleType m_type;
-
-	bool doesHaveCollision = true;
+	bool isMoveDownDone = false;	
+	ObstacleType m_type;	
+	//For animation
+	bool isAnimated;	
 };

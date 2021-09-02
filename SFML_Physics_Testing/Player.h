@@ -3,16 +3,16 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <unordered_map>
 #include "Sound.h"
 #include "Obstacle.h"
+#include "Collision.h"
+#include "Animator.h"
 
 class Player {
-public:
+public:	
 	enum class Directions {
-		UP,
-		LEFT,
 		RIGHT,
+		LEFT,
 		NO_DIR
 	};
 	enum class States {
@@ -22,12 +22,11 @@ public:
 		IDLE
 	};
 	Player() = delete;
-	Player(std::string textureFilePath, int width, int height, int numberOfFrames) 
-		: m_width(width), m_height(height), framesNumber(numberOfFrames)
+	Player(std::string textureFilePath) :
+		m_animation(&m_sprite, 0.1f)
 	{
 		m_texture.loadFromFile(textureFilePath);
-		m_sprite.setTexture(m_texture);
-		m_sprite.setTextureRect(sf::IntRect(0, 0, m_width, m_height));
+		m_sprite.setTexture(m_texture);		
 
 		m_velocity.x = 0;
 		m_velocity.y = 0;		
@@ -35,33 +34,29 @@ public:
 		//Sounds
 		m_jumpSound.setSound("Sounds\\jump.wav");
 		m_hurtSound.setSound("Sounds\\hurt.wav");
-		m_exitSound.setSound("Sounds\\exit.wav");
-
-		collisionBox.setFillColor(sf::Color::Transparent);
-		collisionBox.setOutlineThickness(1.f);
-		collisionBox.setOutlineColor(sf::Color::Magenta);
-		collisionBox.setSize(sf::Vector2f(m_sprite.getGlobalBounds().width, m_sprite.getGlobalBounds().height));
+		m_exitSound.setSound("Sounds\\exit.wav");	
+		//Anim
+		m_animation.addAnimFrame(sf::IntRect(0, 0, 32, 32));
+		m_animation.addAnimFrame(sf::IntRect(32, 0, 32, 32));
+		m_animation.addAnimFrame(sf::IntRect(64, 0, 32, 32));
+		m_animation.addAnimFrame(sf::IntRect(96, 0, 32, 32));
+		m_animation.addAnimFrame(sf::IntRect(128, 0, 32, 32));
 	}
 
 	sf::Vector2f getPosition() const { return sf::Vector2f(m_position.x, m_position.y); }
 	sf::FloatRect getBounds() const { return m_sprite.getGlobalBounds(); }
 
-	void setPosition(float x, float y) {
-		m_position.x = x;
-		m_position.y = y;
+	void setPosition(sf::Vector2f pos) {
+		m_position.x = pos.x;
+		m_position.y = pos.y;
 		m_sprite.setPosition(sf::Vector2f(m_position.x, m_position.y));			
-	}	
-	void setColliderPosition(float x, float y) {
-		collider.left = x;
-		collider.top = y;		
-	}
-	void setDirection(Directions dir) { currentDirection = dir; }
+	}		
 
 	void setState(States state) { currentState = state; }
 
 	void draw(sf::RenderWindow& window, bool drawCollision = false) { 
-		window.draw(m_sprite); 
-		if (drawCollision) window.draw(collisionBox); 
+		window.draw(m_sprite); 		
+		if (drawCollision) m_collider.draw(window); 
 	}
 
 	void getUserControl();
@@ -71,8 +66,7 @@ public:
 	void checkCollision(std::vector<Obstacle>& levelTiles, float deltaTime);
 
 	void setStartPos(sf::Vector2f startPoint) { m_startPos = startPoint; }
-
-	void animate(float deltaTime);
+	
 private:	
 	float m_walkSpeed = 3;
 	float m_jumpForce = 12;
@@ -81,9 +75,9 @@ private:
 	sf::Vector2f m_velocity;
 	sf::Vector2f m_acceleration;
 	
-	sf::RectangleShape collisionBox;
-	sf::FloatRect collider;
-	
+	//Collision	
+	Collision m_collider;
+
 	sf::Vector2f m_startPos;
 	//Sounds
 	Sound m_hurtSound;
@@ -92,17 +86,15 @@ private:
 
 	bool isOnGround = false;
 	bool isJumping = false;
-	bool isJumpDone = false;
+	bool isJumpDone = false;	
 	
 	Directions currentDirection = Directions::NO_DIR;
 	States currentState = States::IDLE;
-
+	//
 	sf::Texture m_texture;	
 	sf::Sprite m_sprite;
 	//Animation
-	float currentFrame = 1;
-	int framesNumber = 1;
-	int m_width, m_height;
+	Animator m_animation;
 
 };
 

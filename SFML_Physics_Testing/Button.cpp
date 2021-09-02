@@ -14,13 +14,25 @@ void Button::draw(sf::RenderWindow& window) {
 void Button::playSound() {
 	m_sound.play();
 }
-bool Button::isPressed(sf::Event& event) {
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) &&
-		event.mouseButton.x > m_sprite.getGlobalBounds().left &&
-		event.mouseButton.x < m_sprite.getGlobalBounds().left + m_sprite.getGlobalBounds().width &&
-		event.mouseButton.y > m_sprite.getGlobalBounds().top &&
-		event.mouseButton.y < m_sprite.getGlobalBounds().top + m_sprite.getGlobalBounds().height) {
+//            !!!Change EVENT to MOUSE!!!
+bool Button::isPressed(sf::Event& event) {		
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && (
+		event.mouseButton.x > m_sprite.getPosition().x &&
+		event.mouseButton.x < m_sprite.getPosition().x + m_sprite.getGlobalBounds().width &&
+		event.mouseButton.y > m_sprite.getPosition().y &&
+		event.mouseButton.y < m_sprite.getPosition().y + m_sprite.getGlobalBounds().height)) {
 
 		return true;
 	}
+	return false;
+}
+void Button::update(float deltaTime, sf::RenderWindow& window) {		
+	m_animation.setAnimationSpeed(0.1f);
+	if (sf::Mouse::getPosition(window).x > m_sprite.getPosition().x &&
+		sf::Mouse::getPosition(window).x < m_sprite.getPosition().x + m_sprite.getGlobalBounds().width &&
+		sf::Mouse::getPosition(window).y > m_sprite.getPosition().y &&
+		sf::Mouse::getPosition(window).y < m_sprite.getPosition().y + m_sprite.getGlobalBounds().height) {		
+		m_animation.playAnimation(deltaTime, 1, m_animation.getFramesCountInSequence());
+	}
+	else m_animation.playAnimation(deltaTime, 1, 1);
 }

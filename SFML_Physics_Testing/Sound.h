@@ -8,9 +8,11 @@ public:
 		buffer.loadFromFile(filePath);
 		sound.setBuffer(buffer);
 	}
-	void playSound() { 
-		
+	void playSound() { 		
 		sound.play();
+	}
+	void stopSound() {
+		sound.stop();
 	}
 	void setLoop(bool isLoop) { sound.setLoop(isLoop); }
 	void setLatency(int mileseconds) { latency = mileseconds; }

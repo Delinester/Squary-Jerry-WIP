@@ -1,24 +1,29 @@
 #include "Game.h"
 
 void Game::updateEverything() {
-	if (currentState == States::IN_GAME) {
+	if (currentState == States::MENU) {
+		m_startButton.update(m_deltaTime, *m_windowPtr);
+	}
+	else if (currentState == States::IN_GAME) {
 		m_player.update(m_deltaTime, m_gravity, levelTiles);
 		for (int i = 0; i < levelTiles.size(); ++i) levelTiles[i].update(m_deltaTime);
 	}
 }
-
-void Game::drawEverything(sf::RenderWindow& window) {
-	if (currentState == States::IN_GAME) {
-		window.draw(m_backgroundSprite);
-		for (int i = 0; i < levelTiles.size(); ++i) levelTiles[i].draw(window, doDrawCollision);
-		m_player.draw(window, doDrawCollision);
+void Game::drawEverything() {
+	if (currentState == States::IN_GAME) {		
+		m_windowPtr->draw(m_backgroundSprite);
+		for (int i = 0; i < levelTiles.size(); ++i) levelTiles[i].draw(*m_windowPtr, doDrawCollision);
+		m_player.draw(*m_windowPtr, doDrawCollision);
 	}
 	else if (currentState == States::MENU) {
-		this->initializeMenu(window, currentEvent);
+		this->initializeMenu(*m_windowPtr, currentEvent);
 	}
 }
+void Game::setWindow(sf::RenderWindow* window) {
+	m_windowPtr = window;
+}
 void Game::createLevel() {
-	if (currentLevel == 1) initializeLevel1();
+	if (currentLevel == 1) initializeLevel1();	
 	constructLevel();
 }
 void Game::constructLevel() {
@@ -68,9 +73,7 @@ void Game::constructLevel() {
 			}
 			else if (levelInNumbers[i][j] == 8) {
 				Obstacle spikesLeft(&m_spikesLeftTexture, Obstacle::ObstacleType::SPIKE);
-				spikesLeft.setSpritePos(sf::Vector2f(x + 33, y));
-				spikesLeft.moveCollider(0, 4);
-				spikesLeft.setColliderScale(0.7f);
+				spikesLeft.setSpritePos(sf::Vector2f(x + 33, y));				
 				levelTiles.push_back(spikesLeft);
 			}
 			else if (levelInNumbers[i][j] == 9) {
@@ -91,8 +94,24 @@ void Game::constructLevel() {
 				checkPoint.setCollision(false);
 				levelTiles.push_back(checkPoint);
 			}
+			else if (levelInNumbers[i][j] == 12) {
+				Obstacle heart(&m_heartSpriteSheet, Obstacle::ObstacleType::HEART);
+				heart.setCollision(false);
+				heart.setSpriteToAnimated(true);
+				heart.m_animation.setAnimationSpeed(0.1f);
+				heart.m_animation.addAnimFrame(sf::IntRect(0, 0, 36, 28));
+				heart.m_animation.addAnimFrame(sf::IntRect(36, 0, 36, 28));
+				heart.m_animation.addAnimFrame(sf::IntRect(72, 0, 36, 28));
+				heart.m_animation.addAnimFrame(sf::IntRect(108, 0, 36, 28));
+				heart.m_animation.addAnimFrame(sf::IntRect(144, 0, 36, 28));
+				heart.m_animation.addAnimFrame(sf::IntRect(180, 0, 36, 28));
+				heart.m_animation.addAnimFrame(sf::IntRect(216, 0, 36, 28));
+				heart.m_animation.addAnimFrame(sf::IntRect(252, 0, 36, 28));
+				heart.setSpritePos(sf::Vector2f(x, y));				
+				levelTiles.push_back(heart);
+			}
 			else if (levelInNumbers[i][j] == 99) {
-				m_player.setPosition(x, y);
+				m_player.setPosition(sf::Vector2f(x, y));
 				m_player.setStartPos(sf::Vector2f(x, y));
 			}
 		}
@@ -108,13 +127,14 @@ void Game::constructLevel() {
 //2, 9 - horizontalMovingPlatform
 //10 - door
 //11 - checkpoint
+// 12 - heart
 //99 - player
 void Game::initializeLevel1() {	
 	levelInNumbers.clear();	
 	levelInNumbers = 
 	  { {4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4},
 		{4,7,7,0,0,8,4,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
-		{4,6,0,0,11,8,4,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
+		{4,6,0,0,12,8,4,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
 		{4,6,0,8,4,8,4,0,0,0,0,4,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
 		{4,4,0,8,4,8,4,0,0,0,4,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
 		{4,6,0,0,4,8,4,0,0,4,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
@@ -126,14 +146,21 @@ void Game::initializeLevel1() {
 		{4,0,0,4,4,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
 		{4,0,0,0,4,8,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4},
 		{4,99,0,0,4,8,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,4},
-		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1} };	
+		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,4} };	
 }
 void Game::initializeMenu(sf::RenderWindow& window, sf::Event& event) {
 	window.draw(m_menuBackgroundSprite);
-	startButton.draw(window);
-	if (startButton.isPressed(event)) {
+	m_startButton.setPosition(450.f, 300.f);
+	m_startButton.draw(window);
+	if (!isMenuMusicPlaying) {
+		m_backgroundMusic.setLoop(true);
+		m_backgroundMusic.playSound();
+		isMenuMusicPlaying = true;
+	}
+	if (m_startButton.isPressed(event)) {
+		m_backgroundMusic.stopSound();
 		this->createLevel();
-		startButton.playSound();
+		m_startButton.playSound();
 		currentState = States::IN_GAME;
     }
 }
