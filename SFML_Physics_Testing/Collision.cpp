@@ -4,9 +4,9 @@ void Collision::setColliderPos(sf::Vector2f vectPos) {
 	m_collider.left = vectPos.x;
 	m_collider.top = vectPos.y;
 }
-void Collision::setColliderScale(float scale) {
-	m_collider.width *= scale;
-	m_collider.height *= scale;
+void Collision::setColliderScale(float scaleX, float scaleY) {
+	m_collider.width *= scaleX;
+	m_collider.height *= scaleY;
 }
 void Collision::setColliderSize(float width, float height) {
 	m_collider.width = width;

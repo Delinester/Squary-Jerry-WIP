@@ -1,11 +1,14 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include "Player.h"
 #include <iostream>
 #include <vector>
+
+#include "Player.h"
 #include "Obstacle.h"
 #include "Button.h"
 #include "Sound.h"
+#include "LevelEditor.h"
+
 class Game {
 public:		
 	enum class States {
@@ -13,11 +16,15 @@ public:
 		MENU_SETTTINGS,
 		MENU_LEVEL_SELECTOR,
 		IN_GAME,
-		DEATH_SCREEN
+		DEATH_SCREEN,
+		IN_LEVEL_EDITOR
 	};
 	Game() :
 		m_player("Textures\\player.png"),
-		m_startButton("Textures\\startButton.png", "Sounds\\startSound.wav")
+		m_startButton("Textures\\startButton.png", "Sounds\\startSound.wav"),		
+		m_restartButton("Textures\\restartButton.png", "Sounds\\restart.wav"),
+		m_editorButton("Textures\\editorButton.png"),
+		m_levelEditor(&levelInNumbers)
 	{
 		m_groundTexture1.loadFromFile("Textures\\ground.png");
 		m_groundTexture2.loadFromFile("Textures\\ground2.png");
@@ -25,26 +32,29 @@ public:
 		m_wallTexture.loadFromFile("Textures\\wall.png");
 		m_doorTexture.loadFromFile("Textures\\door.png");
 		m_checkPointTexture.loadFromFile("Textures\\checkPoint.png");
-
 		m_spikesUpTexture.loadFromFile("Textures\\spikesUp.png");
 		m_spikesDownTexture.loadFromFile("Textures\\spikesDown.png");
 		m_spikesLeftTexture.loadFromFile("Textures\\spikesLeft.png");
-		m_spikesRightTexture.loadFromFile("Textures\\spikesRight.png");
-		
+		m_spikesRightTexture.loadFromFile("Textures\\spikesRight.png");		
 		m_heartSpriteSheet.loadFromFile("Textures\\heart.png");
-
 		m_lavaTexture.loadFromFile("Textures\\lava.png");
 		m_backgroundTexture.loadFromFile("Textures\\background.png");
 		m_menuBackgroundTexture.loadFromFile("Textures\\menuBackground.png");
+		m_deathFrameTexture.loadFromFile("Textures\\deathFrame.png");
 
 		m_backgroundSprite.setTexture(m_backgroundTexture);
 		m_menuBackgroundSprite.setTexture(m_menuBackgroundTexture);		
 		
 		m_backgroundMusic.setSound("Sounds\\backgroundMusic.wav");
+		m_deathSound.setSound("Sounds\\death.wav");
 
 		m_startButton.m_animation.addAnimFrame(sf::IntRect(0, 0, 330, 130));
 		m_startButton.m_animation.addAnimFrame(sf::IntRect(330, 0, 330, 130));
-		m_startButton.m_animation.addAnimFrame(sf::IntRect(660, 0, 330, 130));		
+		m_startButton.m_animation.addAnimFrame(sf::IntRect(660, 0, 330, 130));	
+
+		m_restartButton.m_animation.addAnimFrame(sf::IntRect(0, 0, 180, 189));
+		m_restartButton.m_animation.addAnimFrame(sf::IntRect(180, 0, 180, 189));
+		
 	}	
 	void updateEverything();
 	void drawEverything();
@@ -61,7 +71,8 @@ public:
 	void createLevel();
 	void constructLevel();
 
-	void initializeMenu(sf::RenderWindow& window, sf::Event& event);
+	void initializeMenu();
+	void initializeDeathScreen();
 	void initializeMenuSettings();
 
 	void initializeLevel1();
@@ -86,22 +97,29 @@ private:
 	sf::Texture m_lavaTexture;
 	sf::Texture m_backgroundTexture;
 	sf::Texture m_menuBackgroundTexture;
+
+	sf::Texture m_deathFrameTexture;
 	//Sprites
 	sf::Sprite m_menuBackgroundSprite;
 	sf::Sprite m_backgroundSprite;
 	//Sounds
 	Sound m_backgroundMusic;
-	//Arrays for Level1
+	Sound m_deathSound;
+	//Arrays for Level
 	std::vector<std::vector<int>> levelInNumbers;
 	std::vector<Obstacle> levelTiles;
-	//For UI
+	//For UI and Buttons
 	bool isMenuMusicPlaying = false;
 	Button m_startButton;
+	Button m_restartButton;
+	Button m_editorButton;
 	//For debugging
 	bool doDrawCollision = false;
 	sf::Event currentEvent;
 	sf::RenderWindow* m_windowPtr;
-	//
+	// LevelEditor
+	LevelEditor m_levelEditor;
+	// Game state
 	States currentState = States::MENU;	
 	//World variables
 	float m_deltaTime;

@@ -56,6 +56,7 @@ public:
 	ObstacleType getType() const;
 	sf::FloatRect getColliderBounds() const;
 	sf::FloatRect getSpriteBounds() const;
+	Collision& getCollider();
 
 	bool isCollisionEnabled() const;
 	

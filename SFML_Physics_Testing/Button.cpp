@@ -14,13 +14,12 @@ void Button::draw(sf::RenderWindow& window) {
 void Button::playSound() {
 	m_sound.play();
 }
-//            !!!Change EVENT to MOUSE!!!
-bool Button::isPressed(sf::Event& event) {		
+bool Button::isPressed(sf::RenderWindow& window) {
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && (
-		event.mouseButton.x > m_sprite.getPosition().x &&
-		event.mouseButton.x < m_sprite.getPosition().x + m_sprite.getGlobalBounds().width &&
-		event.mouseButton.y > m_sprite.getPosition().y &&
-		event.mouseButton.y < m_sprite.getPosition().y + m_sprite.getGlobalBounds().height)) {
+		sf::Mouse::getPosition(window).x > m_sprite.getPosition().x &&
+		sf::Mouse::getPosition(window).x < m_sprite.getPosition().x + m_sprite.getGlobalBounds().width &&
+		sf::Mouse::getPosition(window).y > m_sprite.getPosition().y &&
+		sf::Mouse::getPosition(window).y < m_sprite.getPosition().y + m_sprite.getGlobalBounds().height)) {
 
 		return true;
 	}

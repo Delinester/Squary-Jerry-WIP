@@ -7,6 +7,7 @@
 #include "Obstacle.h"
 #include "Collision.h"
 #include "Animator.h"
+#include "StatusBar.h"
 
 class Player {
 public:	
@@ -23,7 +24,7 @@ public:
 	};
 	Player() = delete;
 	Player(std::string textureFilePath) :
-		m_animation(&m_sprite, 0.1f)
+		m_animation(&m_sprite, 0.1f), m_healthBar("Textures\\healthBar.png", true, 100)
 	{
 		m_texture.loadFromFile(textureFilePath);
 		m_sprite.setTexture(m_texture);		
@@ -35,38 +36,29 @@ public:
 		m_jumpSound.setSound("Sounds\\jump.wav");
 		m_hurtSound.setSound("Sounds\\hurt.wav");
 		m_exitSound.setSound("Sounds\\exit.wav");	
+		m_healthUpSound.setSound("Sounds\\healthUp.wav");
 		//Anim
 		m_animation.addAnimFrame(sf::IntRect(0, 0, 32, 32));
 		m_animation.addAnimFrame(sf::IntRect(32, 0, 32, 32));
 		m_animation.addAnimFrame(sf::IntRect(64, 0, 32, 32));
 		m_animation.addAnimFrame(sf::IntRect(96, 0, 32, 32));
-		m_animation.addAnimFrame(sf::IntRect(128, 0, 32, 32));
+		m_animation.addAnimFrame(sf::IntRect(128, 0, 32, 32));		
 	}
-
-	sf::Vector2f getPosition() const { return sf::Vector2f(m_position.x, m_position.y); }
-	sf::FloatRect getBounds() const { return m_sprite.getGlobalBounds(); }
-
-	void setPosition(sf::Vector2f pos) {
-		m_position.x = pos.x;
-		m_position.y = pos.y;
-		m_sprite.setPosition(sf::Vector2f(m_position.x, m_position.y));			
-	}		
-
-	void setState(States state) { currentState = state; }
-
-	void draw(sf::RenderWindow& window, bool drawCollision = false) { 
-		window.draw(m_sprite); 		
-		if (drawCollision) m_collider.draw(window); 
-	}
-
 	void getUserControl();
-
+	void checkCollision(std::vector<Obstacle>& levelTiles, float deltaTime);	
 	void update(float deltaTime, float gravity, std::vector<Obstacle>& levelTiles);
 
-	void checkCollision(std::vector<Obstacle>& levelTiles, float deltaTime);
+	sf::Vector2f getPosition() const;
+	sf::FloatRect getBounds() const;
 
-	void setStartPos(sf::Vector2f startPoint) { m_startPos = startPoint; }
-	
+	void setPosition(sf::Vector2f pos);
+
+	void setState(States state);
+
+	void draw(sf::RenderWindow& window, bool drawCollision = false);
+	void setStartPos(sf::Vector2f startPoint);
+	bool isAlive() const;
+	void resetHealth();
 private:	
 	float m_walkSpeed = 3;
 	float m_jumpForce = 12;
@@ -83,18 +75,20 @@ private:
 	Sound m_hurtSound;
 	Sound m_jumpSound;
 	Sound m_exitSound;
-
+	Sound m_healthUpSound;
+	//
 	bool isOnGround = false;
 	bool isJumping = false;
 	bool isJumpDone = false;	
 	
 	Directions currentDirection = Directions::NO_DIR;
 	States currentState = States::IDLE;
-	//
+	//	
 	sf::Texture m_texture;	
 	sf::Sprite m_sprite;
 	//Animation
 	Animator m_animation;
-
+	//Health
+	StatusBar m_healthBar;
+	float m_health = 100;	
 };
-

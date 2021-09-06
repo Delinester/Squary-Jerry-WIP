@@ -18,7 +18,7 @@ class Button {
 		void setPosition(float x, float y);
 		void draw(sf::RenderWindow& window);
 		void playSound();
-		bool isPressed(sf::Event& event);
+		bool isPressed(sf::RenderWindow& window);
 		void update(float deltaTime, sf::RenderWindow& window);
 public:
 	Animator m_animation;
@@ -31,5 +31,3 @@ public:
 		sf::SoundBuffer m_sBuffer;
 		sf::Sound m_sound;
 };
-
-

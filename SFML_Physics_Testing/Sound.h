@@ -14,11 +14,8 @@ public:
 	void stopSound() {
 		sound.stop();
 	}
-	void setLoop(bool isLoop) { sound.setLoop(isLoop); }
-	void setLatency(int mileseconds) { latency = mileseconds; }
+	void setLoop(bool isLoop) { sound.setLoop(isLoop); }	
 private:
 	sf::SoundBuffer buffer;
-	sf::Sound sound;
-	int latency;
+	sf::Sound sound;	
 };
-

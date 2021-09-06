@@ -57,7 +57,9 @@ sf::FloatRect Obstacle::getSpriteBounds() const {
 bool Obstacle::isCollisionEnabled() const { 
 	return m_collider.isCollisionEnabled(); 
 }
-
+Collision& Obstacle::getCollider() {
+	return m_collider;
+}
 void Obstacle::update(float deltaTime) {	
 	m_collider.setColliderSize(sf::FloatRect(this->getSpriteBounds().left, this->getSpriteBounds().top, this->getSpriteBounds().width, this->getSpriteBounds().height));
 	if (isAnimated) m_animation.playAnimation(deltaTime, 1, m_animation.getFramesCountInSequence());
